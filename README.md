@@ -495,27 +495,6 @@ We need to create a folder containing: our compiled code, the JRE and a launch s
 mkdir bundle
 cp -r ./jdk8u202-b08-jre ./bundle/jre
 cp app.jar ./bundle/app.jar
-touch bundle/run.sh
-chmod +x ./bundle/run.sh 
-```
-
-Finally, we to write `run.sh`. This script will run our `.jar` using the bundled JRE.
-
-Here are the contents of `./bundle/run.sh`:
-
-```bash
-#!/usr/bin/env bash
-
-HERE=${BASH_SOURCE%/*}
-
-"$HERE/jre/bin/java" -jar "$HERE/app.jar" "$@"
-```
-
-Test the bundle: 
-
-```bash
-$ ./bundle/run.sh 
-Hello, world. 
 ```
 
 **Download `warp-packer`**
@@ -530,7 +509,7 @@ $ chmod +x ./warp-packer
 **Create your self-contained application**
 
 ```bash
-$ ./warp-packer --arch linux-x64 --input_dir bundle --exec run.sh --output app.bin
+$ ./warp-packer --arch linux-x64 --input_dir bundle --exec jre/bin/java --exec-args "-jar app.jar" --output app.bin
 $ chmod +x app.bin
 ```
 

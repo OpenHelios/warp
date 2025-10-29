@@ -23,7 +23,7 @@ pub fn execute(target: &Path, shipped_args: &str, application_directory: &Path) 
         }
     }
 
-    do_execute(target, &combined_args)
+    do_execute(target, &combined_args, application_directory)
 }
 
 #[cfg(target_family = "unix")]
@@ -33,11 +33,12 @@ fn ensure_executable(target: &Path) {
 }
 
 #[cfg(target_family = "unix")]
-fn do_execute(target: &Path, args: &[String]) -> io::Result<i32> {
+fn do_execute(target: &Path, args: &[String], application_directory: &Path) -> io::Result<i32> {
     ensure_executable(target);
 
     Ok(Command::new(target)
         .args(args)
+        .current_dir(application_directory.to_str().unwrap())
         .stdin(Stdio::inherit())
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
@@ -57,7 +58,7 @@ fn is_script(target: &Path) -> bool {
 }
 
 #[cfg(target_family = "windows")]
-fn do_execute(target: &Path, args: &[String]) -> io::Result<i32> {
+fn do_execute(target: &Path, args: &[String], application_directory: &Path) -> io::Result<i32> {
     let target_str = target.as_os_str().to_str().unwrap();
 
     if is_script(target) {
@@ -68,6 +69,7 @@ fn do_execute(target: &Path, args: &[String]) -> io::Result<i32> {
 
         Ok(Command::new("cmd")
             .args(cmd_args)
+            .current_dir(application_directory.to_str().unwrap())
             .stdin(Stdio::inherit())
             .stdout(Stdio::inherit())
             .stderr(Stdio::inherit())
@@ -77,6 +79,7 @@ fn do_execute(target: &Path, args: &[String]) -> io::Result<i32> {
     } else {
         Ok(Command::new(target)
             .args(args)
+            .current_dir(application_directory.to_str().unwrap())
             .stdin(Stdio::inherit())
             .stdout(Stdio::inherit())
             .stderr(Stdio::inherit())
